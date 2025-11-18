@@ -1,0 +1,16 @@
+APP_URL= http://localhost:9000/#/
+MAP_SERVICE_API_KEY=<api_key>
+
+Nama: Ketut Anca Wikan Prastika
+Email: ancawikan87@gmail.com
+ID: f014d5y0955
+
+Map Service: OpenStreetMap (Leaflet.js)
+API Key: Tidak diperlukan (OpenStreetMap gratis)
+Base URL API: https://story-api.dicoding.dev/v1
+
+Catatan:
+- Aplikasi menggunakan Leaflet.js untuk integrasi peta
+- OSM tidak memerlukan API key, sehingga tidak ada rahasia yang perlu disembunyikan
+- Implementasi SPA dengan hash routing
+- Support untuk penambahan cerita dengan geolocation
