@@ -1,163 +1,151 @@
-import CONFIG from "../config.js";
+import CONFIG from '../config.js';
 
 const api = {
-  async getAllStories(page = 1, size = 20) {
+  async getAllStories(pageNumber = 1, pageSize = 20) {
     try {
-      const token = localStorage.getItem("token");
-      const url = `${CONFIG.BASE_URL}/stories?page=${page}&size=${size}`;
-      const headers = {};
-      if (token) headers.Authorization = `Bearer ${token}`;
-
-      const response = await fetch(url, { headers });
-      const data = await response.json();
-
-      if (!response.ok) {
-        const msg = data?.message || `HTTP ${response.status}`;
-        throw new Error(msg);
-      }
-
-      return data;
+      const response = await fetch(
+        `${CONFIG.BASE_URL}/stories?page=${pageNumber}&size=${pageSize}`,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.message || 'Gagal mengambil cerita');
+      return json.data || json;
     } catch (error) {
-      console.error("getAllStories error:", error);
-      return { error: error.message || "Unknown error", listStory: [] };
-    }
-  },
-
-  async addStory(formData, token) {
-    try {
-      const response = await fetch(`${CONFIG.BASE_URL}/stories`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      let data;
-      try {
-        data = await response.json();
-      } catch (e) {
-        data = null;
-      }
-
-      if (!response.ok) {
-        let msg = "Failed to add story";
-        if (data) {
-          if (data.message) msg = data.message;
-          else if (data.error) {
-            msg =
-              typeof data.error === "string"
-                ? data.error
-                : JSON.stringify(data.error);
-          } else if (data.errors) {
-            try {
-              msg = Object.entries(data.errors)
-                .map(([k, v]) => `${k}: ${v}`)
-                .join("; ");
-            } catch (e) {
-              msg = JSON.stringify(data.errors);
-            }
-          } else {
-            msg = JSON.stringify(data);
-          }
-        } else {
-          msg = `HTTP ${response.status}`;
-        }
-        throw new Error(msg);
-      }
-
-      return data;
-    } catch (error) {
-      console.error("Error adding story:", error);
+      console.error('[API] getAllStories error', error);
       throw error;
     }
   },
 
-  async register(name, email, password) {
+  async getDetailStory(id) {
     try {
-      console.log("Registering user:", email);
-      const response = await fetch(`${CONFIG.BASE_URL}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      console.log("Register response status:", response.status);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
-
-      console.log("Register successful:", data);
-      return data;
+      const response = await fetch(`${CONFIG.BASE_URL}/stories/${id}`);
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.message || 'Gagal mengambil detail cerita');
+      return json.data || json;
     } catch (error) {
-      console.error("Error registering:", error);
+      console.error('[API] getDetailStory error', error);
+      throw error;
+    }
+  },
+
+  async addStory(formDataBody, token) {
+    try {
+      const response = await fetch(`${CONFIG.BASE_URL}/stories`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formDataBody,
+      });
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.message || 'Gagal menambah cerita');
+      return json.data || json;
+    } catch (error) {
+      console.error('[API] addStory error', error);
+      throw error;
+    }
+  },
+
+  async deleteStory(storyId, token) {
+    try {
+      const response = await fetch(`${CONFIG.BASE_URL}/stories/${storyId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.message || 'Gagal menghapus cerita');
+      return json.data || json;
+    } catch (error) {
+      console.error('[API] deleteStory error', error);
       throw error;
     }
   },
 
   async login(email, password) {
     try {
-      console.log("Logging in user:", email);
       const response = await fetch(`${CONFIG.BASE_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
-      console.log("Login response status:", response.status);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      console.log("Login successful");
-      return data;
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.message || 'Gagal login');
+      return json;
     } catch (error) {
-      console.error("Error logging in:", error);
+      console.error('[API] login error', error);
       throw error;
     }
   },
 
-  // save subscription to backend so server can send push messages
-  async savePushSubscription(subscription) {
+  async register(name, email, password) {
     try {
-      const token = localStorage.getItem("token");
-      await fetch(`${CONFIG.BASE_URL}/subscriptions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(subscription),
+      const response = await fetch(`${CONFIG.BASE_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
       });
-    } catch (err) {
-      console.error("savePushSubscription error", err);
-      throw err;
-    }
-  },
-
-  async unsubscribePush(subscription) {
-    try {
-      const token = localStorage.getItem("token");
-      await fetch(`${CONFIG.BASE_URL}/subscriptions/unsubscribe`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ endpoint: subscription.endpoint }),
-      });
-    } catch (err) {
-      console.error("unsubscribePush error", err);
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.message || 'Gagal register');
+      return json;
+    } catch (error) {
+      console.error('[API] register error', error);
+      throw error;
     }
   },
 };
 
 export default api;
+
+// Di bagian delete handler, ganti dengan:
+const deleteButtons = document.querySelectorAll(".btn-delete-story");
+deleteButtons.forEach((btn) => {
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const storyId = btn.dataset.storyId;
+    if (!storyId) {
+      console.warn("[Home] No story ID found");
+      return;
+    }
+
+    if (!confirm("Hapus cerita ini?")) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      // Import api di atas file
+      const api = (await import("../../data/api.js")).default;
+
+      // Delete dari API jika user login
+      if (token) {
+        try {
+          await api.deleteStory(storyId, token);
+          console.log("[Home] Story deleted from API:", storyId);
+        } catch (apiErr) {
+          console.warn(
+            "[Home] API delete failed, continuing with local delete:",
+            apiErr
+          );
+        }
+      }
+
+      // Delete dari IndexedDB
+      const { idbDelete } = await import("../../utils/idb.js");
+      await idbDelete("stories", storyId);
+      console.log("[Home] Story deleted from IndexedDB:", storyId);
+
+      // Remove dari DOM
+      btn.closest(".story-card").remove();
+
+      // Update currentStories
+      this.currentStories = this.currentStories.filter((s) => s.id !== storyId);
+
+      alert("✓ Cerita berhasil dihapus");
+    } catch (err) {
+      console.error("[Home] Delete error:", err);
+      alert("❌ Gagal menghapus cerita: " + err.message);
+    }
+  });
+});

@@ -1,3 +1,6 @@
+// Export semua utility functions
+export { default as idb } from './idb.js';
+
 export function showFormattedDate(date, locale = 'en-US', options = {}) {
   return new Date(date).toLocaleDateString(locale, {
     year: 'numeric',

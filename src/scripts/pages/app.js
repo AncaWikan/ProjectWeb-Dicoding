@@ -8,7 +8,6 @@ class App {
   }
 
   _initialAppShell() {
-    // initial render + listen hash
     this._route();
     window.addEventListener("hashchange", () => this._route());
   }
@@ -18,39 +17,35 @@ class App {
     const page = routes[url] || routes["/"];
 
     const renderTask = async () => {
-      // clear container to avoid duplicates
-      this._content.innerHTML = "";
-      this._content.style.opacity = 0;
-      // page.render() should append its element (e.g. #home-page)
-      await page.render();
-      const pageElement = document.querySelector(page.elementId);
-      if (pageElement) {
-        if (!this._content.contains(pageElement))
-          this._content.appendChild(pageElement);
-        // fade-in
-        requestAnimationFrame(() => {
-          this._content.style.transition = "opacity .25s";
-          this._content.style.opacity = 1;
-        });
+      try {
+        // Clear HANYA main-content, bukan header
+        this._content.innerHTML = "";
+
+        // Render halaman
+        await page.render();
+
+        // Verify element exists
+        const pageElement = document.querySelector(page.elementId);
+        if (!pageElement) {
+          console.warn("[App] Page element not found:", page.elementId);
+        }
+      } catch (err) {
+        console.error("[App] Render error:", err);
+        this._content.innerHTML = `<div style="padding: 2rem; color: #d32f2f; text-align: center;"><p>⚠️ Error: ${err.message}</p></div>`;
       }
     };
 
     try {
       if ("startViewTransition" in document) {
-        await document.startViewTransition(async () => {
-          await renderTask();
-        });
+        await document.startViewTransition(renderTask);
       } else {
         await renderTask();
       }
     } catch (err) {
-      console.error("Route render error", err);
-      this._content.innerHTML = `<div class="container"><p>Error: ${err.message}</p></div>`;
-      this._content.style.opacity = 1;
+      console.error("[App] Route error:", err);
     }
   }
 
-  // public helper to force re-render current route (used after logout/sync)
   async renderCurrentRoute() {
     return this._route();
   }

@@ -3,33 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="favicon.png" />
+    <meta
+      name="description"
+      content="Share your stories with location on a map"
+    />
+    <meta name="theme-color" content="#3f51b5" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="manifest" href="/public/manifest.webmanifest" />
+    <link rel="icon" href="/public/images/icon-96.png" />
+
+    <!-- Leaflet CSS -->
     <link
       rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
     />
+
     <title>Story App</title>
   </head>
   <body>
     <a
       href="#main-content"
       class="skip-to-content"
-      style="position: absolute; left: -999px; top: auto; overflow: hidden"
+      style="
+        position: absolute;
+        left: -999px;
+        top: auto;
+        overflow: hidden;
+        z-index: 1101;
+      "
       >Skip to content</a
     >
-    <header>
-      <div class="main-header container">
-        <a class="brand-name" href="#/">📖 Cerita Ku</a>
 
-        <nav id="navigation-drawer" class="navigation-drawer">
-          <ul id="nav-list" class="nav-list">
-            <li><a href="#/">Beranda</a></li>
-            <li><a href="#/add-story">Tambah Cerita</a></li>
-            <li><a href="#/about">Tentang</a></li>
-            <li><a href="#/login">Login</a></li>
-          </ul>
-        </nav>
-
+    <header id="app-header">
+      <nav class="navbar">
+        <h1>Story App</h1>
+        <ul class="nav-list" id="nav-list">
+          <li><a href="#/">Home</a></li>
+          <li><a href="#/about">About</a></li>
+          <li><a href="#/add-story">Add Story</a></li>
+          <li>
+            <button
+              id="notification-toggle"
+              class="notification-btn"
+              style="
+                display: none;
+                padding: 0.5rem 1rem;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid white;
+                cursor: pointer;
+                border-radius: 4px;
+                font-size: 0.9rem;
+                transition: all 0.3s ease;
+              "
+            >
+              🔔 Enable Notifications
+            </button>
+          </li>
+        </ul>
         <button
           id="drawer-button"
           class="drawer-button"
@@ -37,11 +72,46 @@
         >
           ☰
         </button>
-      </div>
+      </nav>
+      <nav
+        id="navigation-drawer"
+        class="navigation-drawer"
+        aria-label="Mobile navigation"
+      >
+        <ul class="nav-list">
+          <li><a href="#/">Home</a></li>
+          <li><a href="#/about">About</a></li>
+          <li><a href="#/add-story">Add Story</a></li>
+          <li>
+            <button
+              id="notification-toggle-drawer"
+              class="notification-btn-drawer"
+              style="
+                display: none;
+                padding: 0.75rem;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid white;
+                cursor: pointer;
+                border-radius: 4px;
+                font-size: 0.9rem;
+                width: 100%;
+                margin-top: 0.5rem;
+                transition: all 0.3s ease;
+              "
+            >
+              🔔 Enable Notifications
+            </button>
+          </li>
+        </ul>
+      </nav>
     </header>
 
-    <main id="main-content" class="main-content"></main>
+    <main id="main-content" class="main-content" tabindex="-1"></main>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+    <script src="/bundle.js"></script>
   </body>
 </html>

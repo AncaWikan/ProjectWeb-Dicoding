@@ -1,4 +1,4 @@
-APP_URL= http://localhost:9000/#/
+APP_URL= https://ancawikan.github.io/ProjectWeb-Dicoding/#/
 MAP_SERVICE_API_KEY=<api_key>
 
 Nama: Ketut Anca Wikan Prastika
